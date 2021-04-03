@@ -89,8 +89,6 @@ void TestScheme::testBasic(long logN, long L, long logp, long logSlots) {
 	srand(time(NULL));
 	//-----------------------------------------
 	long slots = (1 << logSlots);
-	//cout << log(slots)/log(2) << endl;
-	//cout << slots << endl;
 	double bound = 1.0;
 	complex<double>* mvec1 = EvaluatorUtils::randomComplexArray(slots, bound);
 	complex<double>* mvec2 = EvaluatorUtils::randomComplexArray(slots, bound);

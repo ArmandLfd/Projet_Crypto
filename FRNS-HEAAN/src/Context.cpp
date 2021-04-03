@@ -65,7 +65,7 @@ Context::Context(long logN, long logp, long L, long K, long h, double sigma) :
 		}
 		bnd++;
 	}
-
+	
 	if(logp - logN - 1 - ceil(log2(bnd)) < 10) {
 		cerr << "ERROR: too small number of precision" << endl;
 		cerr << "TRY to use larger logp or smaller depth" << endl;
@@ -278,6 +278,7 @@ Context::Context(long logN, long logp, long L, long K, long h, double sigma) :
 			}
 		}
 	}
+	cout << ceil(log2(QModp[L-1][K-1])) << endl;
 	QInvModp = new uint64_t*[L];
 	for (long i = 0; i < L; ++i) {
 		QInvModp[i] = new uint64_t[K]();
