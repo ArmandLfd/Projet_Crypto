@@ -20,7 +20,10 @@ int main() {
 	// logSlots -> slots = 1 << logSlots <-> slots = 2^logSlots mod 32(sizeofBits(long))
 	//
 	// QL -> Ql = q^l in theory for RNS -> approximate (for 0 <= i <= l) Ql *= qi => QL becomes (for 0 <= i <= L) QL *= qi -> logQL = log(mul qi)
-	// In lines 270-280 in Context.cpp, they compute QModp -> array[L][K] -> (for 0 <= i <= l) el[l][j] = (mul qi)mod j
+	// In lines 270-292 in Context.cpp, they compute QModp -> array[L][K] -> (for 0 <= i <= l) el[l][j] = (mul qi)mod j
+	// See code in comments at those lines
+	// Very near of the value said in the pdf : 1) logQL = 323 2) logQL = 602 3) logQL = 857
+	// That could explain why there is no way to vary this parameter.
 	TestScheme::testBasic(15, 5, 55, 1);
 	
 	TestScheme::testBasic(15, 10, 55, 1);
