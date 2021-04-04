@@ -16,7 +16,8 @@ public:
 	//   STANDARD TESTS
 	//----------------------------------------------------------------------------------
 	
-
+	static void testBasic(long logq, long logp, long logn);
+	
 	static void testEncrypt(long logq, long logp, long logn);
 	
 	static void testEncryptBySk(long logq, long logp, long logn);

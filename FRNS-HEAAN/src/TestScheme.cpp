@@ -111,21 +111,6 @@ void TestScheme::testBasic(long logN, long L, long logp, long logSlots) {
 	timeutils.stop("Encrypt two batch");
 	Ciphertext cipher2 = scheme.encrypt(mvec2, slots, L);
 	
-	timeutils.start("Homomorphic Addition");
-	Ciphertext addCipher = scheme.add(cipher1, cipher2);
-	timeutils.stop("Homomorphic Addition");
-
-	timeutils.start("Homomorphic Multiplication & Rescaling");
-	Ciphertext multCipher = scheme.mult(cipher1, cipher2);
-	scheme.reScaleByAndEqual(multCipher, 1);
-	timeutils.stop("Homomorphic Multiplication & Rescaling");
-
-	//Remove Rescaling because do not need that for test
-	timeutils.start("Homomorphic Constant Multiplication");
-	Ciphertext cmultCipher = scheme.multByConstVec(cipher1, cvec, slots);
-	//scheme.reScaleByAndEqual(cmultCipher, 1);
-	timeutils.stop("Homomorphic Constant Multiplication");
-
 	timeutils.start("Decrypt batch");
 	complex<double>* dvec1 = scheme.decrypt(secretKey, cipher1);
 	/* Do not decrypt this things, only one cipher
@@ -133,6 +118,21 @@ void TestScheme::testBasic(long logN, long L, long logp, long logSlots) {
 	complex<double>* dvecCMult = scheme.decrypt(secretKey, cmultCipher);
 	complex<double>* dvecMult = scheme.decrypt(secretKey, multCipher);*/
 	timeutils.stop("Decrypt batch");
+	
+	timeutils.start("Homomorphic Addition");
+	Ciphertext addCipher = scheme.add(cipher1, cipher2);
+	timeutils.stop("Homomorphic Addition");
+
+	//Remove Rescaling because do not need that for test
+	timeutils.start("Homomorphic Constant Multiplication");
+	Ciphertext cmultCipher = scheme.multByConstVec(cipher1, cvec, slots);
+	//scheme.reScaleByAndEqual(cmultCipher, 1);
+	timeutils.stop("Homomorphic Constant Multiplication");
+
+	timeutils.start("Homomorphic Multiplication & Rescaling");
+	Ciphertext multCipher = scheme.mult(cipher1, cipher2);
+	scheme.reScaleByAndEqual(multCipher, 1);
+	timeutils.stop("Homomorphic Multiplication & Rescaling");
 
 	/*StringUtils::showcompare(mvecAdd, dvecAdd, slots, "add");
 	StringUtils::showcompare(mvecMult, dvecMult, slots, "mult");

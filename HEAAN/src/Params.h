@@ -11,8 +11,9 @@
 #include <NTL/ZZ.h>
 using namespace NTL;
 
+// Need more than one logN and logQ -> Do not see how to do it without doing a large refactoring ... -> Change the parameters manually
 static const long logN = 16;
-static const long logQ = 800; // 128-bit security
+static const long logQ = 886; // 128-bit security
 
 static const double sigma = 3.2;
 static const long h = 64;

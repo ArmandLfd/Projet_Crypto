@@ -42,12 +42,12 @@ Context::Context(long logN, long logp, long L, long K, long h, double sigma) :
 
 	bnd = 1;
 	while(1) {
-			uint64_t prime = (1ULL << Q0_BIT_SIZE) + bnd * M + 1;
-			if(primeTest(prime)) {
-				qVec[0] = prime;
-				break;
-			}
-			bnd++;
+		uint64_t prime = (1ULL << Q0_BIT_SIZE) + bnd * M + 1;
+		if(primeTest(prime)) {
+			qVec[0] = prime;
+			break;
+		}
+		bnd++;
 	}
 
 	bnd = 1;
@@ -266,19 +266,31 @@ Context::Context(long logN, long logp, long L, long K, long h, double sigma) :
 	for (long i = 0; i < L; ++i) {
 		PInvModq[i] = invMod(PModq[i], qVec[i]);
 	}
-
+	
+	/*
+	uint64_t countLogQL = 0;
+	for(int i = 0; i < L; i++){
+		countLogQL += ceil(log2(qVec[i])); // Correct beacause log(a.b) = log(a) + log(b)
+	}
+	cout << countLogQL << endl;
+	*/
+	
+	//uint64_t countLogQL[L];
 	QModp = new uint64_t*[L];
 	for (long i = 0; i < L; ++i) {
 		QModp[i] = new uint64_t[K]();
+		//countLogQL[i] = 1;
 		for (long k = 0; k < K; ++k) {
 			QModp[i][k] = 1;
 			for (long j = 0; j < i + 1; ++j) {
 				uint64_t temp = qVec[j] % pVec[k];
 				mulMod(QModp[i][k], QModp[i][k], temp, pVec[k]);
 			}
+			//countLogQL[i] += ceil(log2(QModp[i][k])); // Correct beacause log(a.b) = log(a) + log(b)
+			//cout << ceil(log2(QModp[i][k])) << endl;
 		}
+		//cout << countLogQL[i] << endl;
 	}
-	cout << ceil(log2(QModp[L-1][K-1])) << endl;
 	QInvModp = new uint64_t*[L];
 	for (long i = 0; i < L; ++i) {
 		QInvModp[i] = new uint64_t[K]();

@@ -29,6 +29,41 @@ using namespace NTL;
 //----------------------------------------------------------------------------------
 
 
+void TestScheme::testBasic(long logq, long logp, long logn){
+	cout << "!!! START TEST BASIC !!!" << endl;
+	srand(time(NULL));
+	SetNumThreads(8);
+	TimeUtils timeutils;
+	Ring ring;
+	SecretKey secretKey(ring);
+	Scheme scheme(secretKey, ring);
+
+	long n = (1 << logn);
+	complex<double>* mvec1 = EvaluatorUtils::randomComplexArray(n);
+	complex<double>* mvec2 = EvaluatorUtils::randomComplexArray(n);
+	Ciphertext cipher1;
+	Ciphertext cipher2;
+
+	timeutils.start("Encrypt");
+	scheme.encrypt(cipher1, mvec1, n, logp, logq);
+	timeutils.stop("Encrypt");
+	scheme.encrypt(cipher1, mvec1, n, logp, logq);
+
+	timeutils.start("Decrypt");
+	complex<double>* dvec = scheme.decrypt(secretKey, cipher1);
+	timeutils.stop("Decrypt");
+
+	timeutils.start("Addition");
+	scheme.addAndEqual(cipher1, cipher2);
+	timeutils.stop("Addition");
+
+	timeutils.start("Multiplication");
+	scheme.multAndEqual(cipher1, cipher2);
+	timeutils.stop("Multiplication");
+	
+	cout << "!!! END TEST BASIC !!!" << endl;
+
+}
 void TestScheme::testEncrypt(long logq, long logp, long logn) {
 	cout << "!!! START TEST ENCRYPT !!!" << endl;
 	srand(time(NULL));
