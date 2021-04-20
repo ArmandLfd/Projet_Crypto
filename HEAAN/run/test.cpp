@@ -16,15 +16,10 @@
   */
 int main(int argc, char **argv) {
 
-	//long logq = 55; ///< Ciphertext Modulus
-	//long logp = 55; ///< Real message will be quantized by multiplying 2^40
-	//long logn = 1; ///< log2(The number of slots)
-	// !!! All others parameters are in param.h !!!
-	// For L, the only thing that I found in the code is at lines 165-166 in scheme.cpp.
-	// logl is given in parameters. And used in TestScheme.cpp and Ring.cpp as logSlots
-	// logn =? logl ???
-	// Moreover, in HEAAN page 13 at Table 1, they explain that encrypting a plaintext will output a <c,L,v,B_clean>
-	// But we ask logn and not L ... => log2(5) = 2,32 log2(10)=3.32 log2(15) = 3.9
+	//long logq = logp*(L+1)(+6 ?);  For some reason all value are ofset by 6 in the paper on FRNS
+	//long logp = scaling factor (= 55 in the test)
+	//long logn = number of slots  (= 1 in the test)
+	//logN is the degree of the cyclotomic polynome (to change, go to param.h)
 	if(argc != 4){
 		cout << "Error : need logq,logp,logn" << endl;
 		return -1;
