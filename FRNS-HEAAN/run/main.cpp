@@ -51,34 +51,43 @@ int main(int argc,char** argv) {
 	
 	TestScheme::testBasic(16, 15, 55, 1);
 	*/
+
+	double maxCountry = 0.0;
+	if(argc >= 2) maxCountry = (double) atoi(argv[1]);
+	else maxCountry = 187.0;
 	
-	int maxCountry = 0;
-	if(argc >= 2) maxCountry = atoi(argv[1]);
-	else maxCountry = 187;
+	long slots = 1 << (int) (ceil(log((int)maxCountry)/log(2)));
 	
-	double numberOfCountry = 1/maxCountry; // Bound = 1.0 
-	double* listNumber = (double*) malloc(sizeof(double)*maxCountry);
-	FILE *file = fopen("worldometer_data.csv","r");
+	double numberOfCountry = (double) (1.0/maxCountry);
+	complex<double>* listNumber = (complex<double>*) malloc(sizeof(complex<double>)*slots);
+	FILE *file = fopen("country_wise_latest.csv","r");
 	if (file == NULL){
 		return -1;
 	}
-	double maxIntFile = 0;
-	for (int i =0;i<187;i++){
-		double tmp = 0;
-		fscanf(file,"%lf", &tmp);
+	long double maxIntFile = 0;
+	for (int i =0;i<209;i++){
+		long double tmp = 0;
+		fscanf(file,"%Lf", &tmp);
 		if(tmp>maxIntFile) maxIntFile = tmp;
 	}
-	
-	for (int i =0;i<maxCountry;i++){
-		double readInt;
-		fscanf(file,"%lf", &readInt);
-		listNumber[i] = (double) readInt/maxIntFile;
-		cout << listNumber[i] << endl;
+	fclose(file);
+	file = fopen("country_wise_latest.csv","r");
+	if (file == NULL){
+		return -1;
+	}
+	for (int i =0;i<slots;i++){
+		long double readInt;
+		if (i < maxCountry){
+			fscanf(file,"%Lf", &readInt);
+			listNumber[i].real((double) (readInt/maxIntFile));
+		}
+		else listNumber[i].real(0.0);
+		//cout << listNumber[i] << endl;
 	}
 	fclose(file);
 	//------------------- Crypto
 	// Param
-	long slots = maxCountry;
+	
 	long L = 5;
 	long K = L + 1;
 	long logN = 14;
@@ -90,23 +99,28 @@ int main(int argc,char** argv) {
 	SchemeAlgo algo(scheme);
 	scheme.addLeftRotKeys(secretKey);
 	//-----------------------------------------
-	srand(time(NULL));
-	//-----------------------------------------
 	Ciphertext cipher = scheme.encrypt(listNumber, slots, L);
 	timeutils.start("Mean of COVID19 infected");
-	Ciphertext sumCipher = algo.partialSlotsSum(cipher, slots);
-	Ciphertext meanCipher = scheme.multByConst(sumCipher, numberOfCountry);
+	algo.partialSlotsSumAndEqual(cipher, slots);
+	cout << "After partial sum:" << scheme.decrypt(secretKey, cipher)[0] << endl;
+	Ciphertext meanCipher = scheme.multByConst(cipher, numberOfCountry);
 	scheme.reScaleByAndEqual(meanCipher, 1);
+	cout << "After multiplying by 1/country:" << scheme.decrypt(secretKey, meanCipher)[0] << endl;
 	timeutils.stop("Mean of COVID19 infected");
 
 	complex<double>* dvec = scheme.decrypt(secretKey, meanCipher);
 
-	double meanPlain;
-	for (long i = 0; i < slots; ++i) {
+	complex<double> meanPlain;
+	for (long i = 0; i < maxCountry; ++i) {
 		meanPlain += listNumber[i];
 	}
-	meanPlain /= maxCountry;
-
+	cout << "Sum of each infections:" << meanPlain << endl;
+	meanPlain *= numberOfCountry;
+	cout << "Multiply by 1/country:" << meanPlain << endl;
+	meanPlain *= maxIntFile;
+	
+	for (int i =0;i<slots;i++) dvec[i] *= maxIntFile;
+	
 	cout << "Result of mean from plaintext: " << meanPlain << "\nResult of mean from ciphertext:" << dvec[0] << endl;
 	//StringUtils::showcompare(meanPlain, dvec, slots, "Mean of COVID19 infected");
 	
